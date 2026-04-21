@@ -16,7 +16,7 @@ const router = express.Router();
 const { getBookingById, updateBooking, appendAuditLog, getDb } = require('../db');
 const { confirmCalendarEvent, deleteCalendarEvent, getAvailableSlots } = require('../services/calendar');
 const { createPaymentLink, getInvoiceFromPaymentLink } = require('../services/stripe');
-const { sendPaymentLinkEmail, sendFollowupMeetingEmail, sendInvoiceEmail, sendRejectionEmail, sendPaymentReminderEmail } = require('../services/email');
+const { sendPaymentLinkEmail, sendFollowupMeetingEmail, sendInvoiceEmail, sendRejectionEmail, sendPaymentReminderEmail, sendAgentEmail } = require('../services/email');
 const { postThreadReply } = require('../services/slack');
 const { syncInvoiceToOdoo } = require('../services/odoo');
 
@@ -278,39 +278,13 @@ router.post('/email', async (req, res) => {
   if (!booking) return res.status(404).json({ error: 'Booking not found' });
 
   try {
-    const nodemailer = require('nodemailer');
-    const fs = require('fs');
-
-    const tokenPath = process.env.GOOGLE_TOKEN_PATH || '/home/trader/.hermes/google_token.json';
-    const token = JSON.parse(fs.readFileSync(tokenPath));
-    const credPath = process.env.GOOGLE_CREDENTIALS_PATH;
-    let clientId, clientSecret;
-    if (credPath && fs.existsSync(credPath)) {
-      const creds = JSON.parse(fs.readFileSync(credPath));
-      const info = creds.installed || creds.web;
-      clientId = info.client_id;
-      clientSecret = info.client_secret;
-    } else {
-      clientId = token.client_id || process.env.GOOGLE_CLIENT_ID;
-      clientSecret = token.client_secret || process.env.GOOGLE_CLIENT_SECRET;
-    }
-
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        type: 'OAuth2',
-        user: process.env.GMAIL_USER,
-        clientId, clientSecret,
-        refreshToken: token.refresh_token,
-        accessToken: token.token || token.access_token,
-      },
-    });
-
-    await transporter.sendMail({
-      from: `"${process.env.ALLUSION_NAME || 'Allusion'}" <${process.env.GMAIL_USER}>`,
+    const { cc: ccAddr } = req.body;
+    sendAgentEmail({
       to: booking.email,
+      cc: ccAddr || null,
       subject,
-      [html ? 'html' : 'text']: body,
+      body,
+      isHtml: !!html,
     });
 
     appendAuditLog(booking_id, 'CUSTOM_EMAIL_SENT', 'agent', subject);

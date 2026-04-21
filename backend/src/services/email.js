@@ -542,6 +542,13 @@ async function sendPaymentReminderEmail(booking, paymentLink) {
   });
 }
 
+// ── sendAgentEmail ────────────────────────────────────────────────────────────
+// Generic email for agent-drafted messages (freeform subject + body).
+// Uses the same google_api.py CLI as all other emails — avoids nodemailer OAuth2 hang.
+function sendAgentEmail({ to, cc, subject, body, isHtml = true }) {
+  sendMail({ to, cc, subject, html: isHtml ? body : `<pre style="font-family:inherit">${body}</pre>` });
+}
+
 module.exports = {
   sendPaymentLinkEmail,
   sendBookingConfirmedEmail,
@@ -549,4 +556,5 @@ module.exports = {
   sendRejectionEmail,
   sendFollowupMeetingEmail,
   sendPaymentReminderEmail,
+  sendAgentEmail,
 };
