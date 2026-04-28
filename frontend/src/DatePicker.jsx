@@ -28,19 +28,19 @@ function CalendarDay({ date, monthDate, dayInfo, selected, onClick }) {
   const noData         = !isPast && isEmpty(dayInfo);
   const disabled       = isPast || fully_booked || noData;
 
-  let dayClasses = 'relative w-9 h-9 rounded-xl flex items-center justify-center text-sm font-medium transition-all duration-150 select-none ';
+  let dayClasses = 'relative w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center text-base sm:text-lg transition-colors duration-150 select-none ';
 
   if (!isCurrentMonth) {
     dayClasses += 'opacity-0 pointer-events-none ';
   } else if (isSelected) {
-    dayClasses += 'bg-amber-400 text-black font-bold shadow-lg shadow-amber-400/30 scale-105 ';
+    dayClasses += 'bg-ink text-paper cursor-pointer ';
   } else if (disabled) {
-    dayClasses += 'text-white/15 cursor-not-allowed ';
-    if (fully_booked) dayClasses += 'bg-red-500/10 line-through decoration-red-500/40 ';
+    dayClasses += 'text-ink-mute/40 cursor-not-allowed ';
+    if (fully_booked) dayClasses += 'line-through decoration-clay/50 ';
   } else if (isTodayDate) {
-    dayClasses += 'text-amber-400 border border-amber-400/40 hover:bg-amber-400/10 cursor-pointer ';
+    dayClasses += 'text-clay cursor-pointer hover:bg-paper-soft ';
   } else {
-    dayClasses += 'text-white/70 hover:bg-white/8 hover:text-white cursor-pointer ';
+    dayClasses += 'text-ink hover:bg-paper-soft cursor-pointer ';
   }
 
   return (
@@ -53,10 +53,10 @@ function CalendarDay({ date, monthDate, dayInfo, selected, onClick }) {
     >
       {format(date, 'd')}
       {partial && !isSelected && (
-        <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-amber-400/60" />
+        <span className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-clay/70" />
       )}
       {fully_booked && (
-        <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-red-500/60" />
+        <span className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-ink-mute/50" />
       )}
     </button>
   );
@@ -64,7 +64,7 @@ function CalendarDay({ date, monthDate, dayInfo, selected, onClick }) {
 
 // refreshKey: increment from parent to force an immediate re-fetch (e.g. after submission)
 export default function DatePicker({ value, onChange, refreshKey = 0 }) {
-  const [viewDate,      setViewDate]   = useState(() => value ? startOfMonth(parseISO(value)) : startOfMonth(today));
+  const [viewDate,      setViewDate]   = useState(() => value ? startOfMonth(parseISO(value)) : startOfMonth(minBookingDate));
   const [monthCache,    setMonthCache] = useState({});
   const [loadingMonths, setLoading]    = useState({});
 
@@ -141,47 +141,49 @@ export default function DatePicker({ value, onChange, refreshKey = 0 }) {
   const partialCount   = allDays.filter(([d, info]) => d >= minStr && !isFull(info) && info.unavailable.length > 0).length;
 
   return (
-    <div className="bg-white/4 border border-white/10 rounded-2xl p-5 select-none">
+    <div className="border border-rule bg-paper p-6 sm:p-8 select-none">
       {/* Month navigation */}
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center justify-between mb-8">
         <button
           type="button"
           onClick={prevMonth}
           disabled={!canGoPrev}
-          className="w-8 h-8 rounded-lg flex items-center justify-center text-white/40 hover:text-white hover:bg-white/8 transition-all disabled:opacity-20 disabled:pointer-events-none"
+          className="w-11 h-11 flex items-center justify-center text-ink-soft hover:text-ink hover:bg-paper-soft transition-colors disabled:opacity-20 disabled:pointer-events-none text-2xl"
+          aria-label="Previous month"
         >
-          ‹
+          ←
         </button>
 
-        <div className="flex items-center gap-2">
-          <span className="text-white font-semibold text-sm">
+        <div className="flex items-center gap-3">
+          <span className="font-serif text-ink text-2xl sm:text-[28px]">
             {format(viewDate, 'MMMM yyyy')}
           </span>
           {isLoading && (
-            <span className="w-3.5 h-3.5 border border-amber-400/40 border-t-amber-400 rounded-full animate-spin" />
+            <span className="w-3 h-3 border border-clay/40 border-t-clay rounded-full animate-spin" />
           )}
         </div>
 
         <button
           type="button"
           onClick={nextMonth}
-          className="w-8 h-8 rounded-lg flex items-center justify-center text-white/40 hover:text-white hover:bg-white/8 transition-all"
+          className="w-11 h-11 flex items-center justify-center text-ink-soft hover:text-ink hover:bg-paper-soft transition-colors text-2xl"
+          aria-label="Next month"
         >
-          ›
+          →
         </button>
       </div>
 
       {/* Weekday headers — Monday first */}
-      <div className="grid grid-cols-7 mb-2">
+      <div className="grid grid-cols-7 mb-2 border-b border-rule pb-3">
         {['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map(d => (
-          <div key={d} className="flex items-center justify-center text-white/25 text-xs font-medium w-9 h-7">
+          <div key={d} className="flex items-center justify-center text-ink-mute text-[11px] uppercase tracking-[0.18em] w-12 sm:w-14 h-7">
             {d}
           </div>
         ))}
       </div>
 
       {/* Day grid */}
-      <div className="grid grid-cols-7 gap-y-1">
+      <div className="grid grid-cols-7 gap-y-1.5 mt-3">
         {gridDays.map((d, i) => {
           const dateStr = format(d, 'yyyy-MM-dd');
           const info    = currentDays[dateStr];
@@ -200,22 +202,22 @@ export default function DatePicker({ value, onChange, refreshKey = 0 }) {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-4 mt-4 pt-3 border-t border-white/6 text-xs text-white/30">
+      <div className="flex items-center gap-6 mt-8 pt-5 border-t border-rule text-[11px] uppercase tracking-[0.2em] text-ink-soft">
         {bookedCount > 0 && (
-          <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-red-500/60 flex-shrink-0" />
+          <span className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-ink-mute flex-shrink-0" />
             Fully booked
           </span>
         )}
         {partialCount > 0 && (
-          <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-amber-400/60 flex-shrink-0" />
-            Partially available
+          <span className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-clay flex-shrink-0" />
+            Partial
           </span>
         )}
         {value && (
-          <span className="flex items-center gap-1.5 ml-auto text-amber-400/60">
-            ✓ {format(parseISO(value), 'MMM d, yyyy')}
+          <span className="ml-auto normal-case tracking-normal text-ink text-lg font-serif">
+            {format(parseISO(value), 'MMMM d, yyyy')}
           </span>
         )}
       </div>

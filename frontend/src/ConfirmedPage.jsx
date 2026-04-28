@@ -14,37 +14,48 @@ export default function ConfirmedPage() {
   }, [id]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-[#0f0f1a]">
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-10 max-w-md w-full text-center">
-        <div className="text-6xl mb-6">🎉</div>
-        <h1 className="text-3xl font-bold text-white mb-3">Booking Confirmed!</h1>
-        <p className="text-white/50 text-base mb-8">
-          Your payment has been received and your booking is fully confirmed.
-          Check your email for the invoice and all details.
+    <div className="min-h-screen flex items-center justify-center px-6 py-20 bg-paper">
+      <div className="max-w-lg w-full">
+        <div className="text-[11px] uppercase tracking-[0.22em] text-clay mb-6">
+          Booking confirmed
+        </div>
+        <h1 className="font-serif text-5xl leading-[1.05] text-ink mb-6">
+          We will see you <span className="italic">then</span>.
+        </h1>
+        <p className="text-ink-soft text-base leading-relaxed mb-10 max-w-md">
+          Payment received. Your evening at Allusion is on the calendar — a copy
+          of the invoice and the practical details are on their way to your inbox.
         </p>
+
         {booking && (
-          <div className="bg-white/5 rounded-xl p-5 text-left space-y-3 text-sm mb-8">
-            <div className="flex justify-between">
-              <span className="text-white/40">Date</span>
-              <span className="text-white font-medium">{booking.date}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-white/40">Slot</span>
-              <span className="text-white font-medium capitalize">{booking.slot}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-white/40">Status</span>
-              <span className="text-green-400 font-medium">✅ Paid & Confirmed</span>
-            </div>
+          <div className="border-t border-rule pt-6 space-y-3 text-sm">
+            <Row k="Date" v={booking.date} />
+            <Row k="Time" v={String(booking.slot).replace(/^\w/, c => c.toUpperCase())} />
+            <Row k="Status" v="Paid · confirmed" />
           </div>
         )}
-        <p className="text-white/20 text-xs font-mono">Booking ID: {id}</p>
-        <div className="mt-6">
-          <a href="/" className="text-amber-400/70 hover:text-amber-400 text-sm transition-colors">
-            ← Book another slot
-          </a>
+
+        <div className="mt-10 text-[11px] uppercase tracking-[0.22em] text-ink-mute">
+          Reference · <span className="font-mono normal-case tracking-normal text-ink-soft">{id}</span>
         </div>
+
+        <a
+          href="/"
+          className="mt-12 inline-flex items-center gap-3 text-ink text-sm uppercase tracking-[0.2em] border-b border-ink/40 pb-1 hover:border-ink transition-colors"
+        >
+          <span aria-hidden="true">←</span>
+          Reserve another evening
+        </a>
       </div>
+    </div>
+  );
+}
+
+function Row({ k, v }) {
+  return (
+    <div className="flex items-baseline justify-between gap-6">
+      <span className="text-ink-mute text-sm">{k}</span>
+      <span className="text-ink text-sm">{v}</span>
     </div>
   );
 }
