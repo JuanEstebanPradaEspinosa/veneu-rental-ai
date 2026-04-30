@@ -1,5 +1,6 @@
 const Stripe = require('stripe');
 require('dotenv').config({ path: require('path').join(__dirname, '../../.env') });
+const { frontendUrl } = require('../config/site');
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -23,7 +24,7 @@ async function createPaymentLink(booking) {
     line_items: [{ price: priceId, quantity: 1 }],
     after_completion: {
       type: 'redirect',
-      redirect: { url: `${process.env.FRONTEND_URL}/booking-confirmed?id=${booking.id}` },
+      redirect: { url: `${frontendUrl}/booking-confirmed?id=${booking.id}` },
     },
     metadata: {
       booking_id: booking.id,

@@ -2,6 +2,7 @@ require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const { frontendUrl } = require('./config/site');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -12,7 +13,7 @@ const stripeWebhookRouter = require('./routes/stripe-webhook');
 app.use('/api/stripe', stripeWebhookRouter);
 
 // ── Standard middleware ────────────────────────────────────────────────────────────────────────────
-app.use(cors({ origin: process.env.FRONTEND_URL || '*' }));
+app.use(cors({ origin: frontendUrl || '*' }));
 
 // express.json with verify to capture rawBody for Slack signature verification
 app.use(express.json({
@@ -50,6 +51,6 @@ if (fs.existsSync(FRONTEND_DIST)) {
   });
 }
 
-app.listen(PORT, () => {
-  console.log(`[Allusion Booking] Server running on http://localhost:${PORT}`);
+app.listen(PORT, '127.0.0.1', () => {
+  console.log(`[Allusion Booking] Server running on http://127.0.0.1:${PORT}`);
 });

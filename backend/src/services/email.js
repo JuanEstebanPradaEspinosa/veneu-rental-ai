@@ -51,7 +51,7 @@ const cfg = {
   name:     () => process.env.ALLUSION_NAME  || 'Allusion',
   email:    () => process.env.ALLUSION_EMAIL || 'info@allusion.be',
   gmailUser:() => process.env.GMAIL_USER     || 'oc.al.assistant@gmail.com',
-  baseUrl:  () => process.env.FRONTEND_URL   || 'http://localhost:5173',
+  baseUrl:  () => require('../config/site').frontendUrl,
 };
 
 // ── Core send ─────────────────────────────────────────────────────────────────
